@@ -1,0 +1,32 @@
+*Texto Pedido de compra
+  ls_header-tdobject = 'MATERIAL'.
+  ls_header-tdname   = i_matnr.
+  ls_header-tdid     = 'BEST'.
+  ls_header-tdspras  = 'PT'.
+
+  LOOP AT tg_matlongtext INTO ls_matlongtext.
+    IF ls_matlongtext-text_id = 'BEST'.
+      ls_lines-tdformat = 'PT'.
+      ls_lines-tdline = ls_matlongtext-text_line.
+      APPEND ls_lines TO tg_lines.
+    ENDIF.
+  ENDLOOP.
+
+  CALL FUNCTION 'SAVE_TEXT'
+    EXPORTING
+      client          = sy-mandt
+      header          = ls_header
+      savemode_direct = 'X'
+    TABLES
+      lines           = tg_lines
+    EXCEPTIONS
+      id              = 1
+      language        = 2
+      name            = 3
+      object          = 4.
+
+  CALL FUNCTION 'BAPI_TRANSACTION_COMMIT'
+    EXPORTING
+      wait = 'X'.
+
+ENDFUNCTION.
